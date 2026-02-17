@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AFSTI | MVP</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --ink:#0b1220;
+      --muted:#5a677a;
+      --line:#e6e9ef;
+      --green:#0e7a46;
+      --green2:#0b5d36;
+      --chip:#f3f5f9;
+      --shadow:0 10px 30px rgba(15,23,42,.10);
+      --radius:16px;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:var(--sans); background:var(--bg); color:var(--ink); }
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      border-bottom:1px solid var(--line);
+      background:rgba(255,255,255,.92);
+      backdrop-filter:saturate(140%) blur(10px);
+    }
+    .topbar-inner{
+      max-width:1400px; margin:0 auto; padding:10px 14px;
+      display:flex; align-items:center; gap:12px; justify-content:space-between;
+    }
+    .brand{ display:flex; align-items:center; gap:10px; min-width:220px; }
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background:linear-gradient(135deg, rgba(14,122,70,.16), rgba(14,122,70,.06));
+      border:1px solid rgba(14,122,70,.22);
+      display:grid; place-items:center; color:var(--green2); font-weight:900;
+    }
+    .title{ line-height:1.1; }
+    .title b{ display:block; font-size:13px; letter-spacing:.2px; }
+    .title span{ display:block; font-size:11px; color:var(--muted); }
+
+    .nav{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .btn{
+      border:1px solid var(--line);
+      background:#fff;
+      padding:8px 10px;
+      border-radius:12px;
+      font-size:12px;
+      color:var(--ink);
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn:hover{ border-color:rgba(14,122,70,.35); box-shadow:0 6px 18px rgba(14,122,70,.08); }
+    .btn.primary{ background:rgba(14,122,70,.08); border-color:rgba(14,122,70,.22); color:var(--green2); }
+    .caret{ font-size:10px; color:var(--muted); }
+
+    .search{
+      display:flex; align-items:center; gap:8px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:8px 10px;
+      background:#fff;
+      min-width:260px;
+    }
+    .search input{
+      border:0; outline:0; width:100%;
+      font-size:12px;
+    }
+
+    .dropdown-wrap{ position:relative; }
+    .dropdown{
+      position:absolute; top:44px; left:0;
+      width:420px; max-height:65vh; overflow:auto;
+      background:#fff; border:1px solid var(--line);
+      border-radius:14px; box-shadow:var(--shadow);
+      padding:8px;
+      display:none;
+    }
+    .dropdown.show{ display:block; }
+    .row{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:10px 10px; border-radius:12px;
+      cursor:pointer;
+    }
+    .row:hover{ background:#f7f9fd; }
+    .row .left{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .row .name{ font-weight:800; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .row .meta{ font-size:11px; color:var(--muted); display:flex; gap:8px; flex-wrap:wrap; }
+    .pill{ font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid var(--line); background:var(--chip); color:var(--muted);}
+    .pill.go{ background:rgba(14,122,70,.08); border-color:rgba(14,122,70,.20); color:var(--green2);}
+    .pill.amb{ background:rgba(179,107,0,.08); border-color:rgba(179,107,0,.20); color:#b36b00;}
+    .pill.stop{ background:rgba(180,35,24,.08); border-color:rgba(180,35,24,.20); color:#b42318;}
+    .ownerTag{ font-family:var(--mono); font-size:11px; color:#304158; }
+
+    .layout{ max-width:1400px; margin:0 auto; padding:12px 14px 20px; }
+    .frame{
+      width:100%;
+      height: calc(100vh - 78px);
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow: 0 10px 30px rgba(15,23,42,.06);
+      background:#fff;
+    }
+    .hint{ font-size:12px; color:var(--muted); margin-top:8px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+    .hint code{ font-family:var(--mono); background:#f6f8fc; border:1px solid var(--line); padding:2px 6px; border-radius:8px; }
+    @media (max-width: 860px){
+      .search{ min-width:180px; }
+      .dropdown{ width: min(92vw, 520px); }
+      .brand{ min-width:auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo">A</div>
+        <div class="title">
+          <b>AFSTI MVP</b>
+          <span>Home → Portfolio dropdown → VC page (Thesis)</span>
+        </div>
+      </div>
+
+      <div class="nav">
+        <button class="btn primary" id="navHome">Home</button>
+        <button class="btn" id="navAbout">About the project</button>
+
+        <div class="dropdown-wrap">
+          <button class="btn" id="navPortfolio">Project Portfolio <span class="caret">▾</span></button>
+          <div class="dropdown" id="portfolioMenu" role="menu" aria-label="Project portfolio">
+            <div class="search" style="margin:6px;">
+              <span style="color:var(--muted);font-size:12px;">⌕</span>
+              <input id="vcSearch" placeholder="Search value chains (e.g., zam, rice, palm)" />
+            </div>
+            <div id="vcList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <iframe class="frame" id="mainFrame" title="AFSTI content" src="home_dashboard.html"></iframe>
+    <div class="hint">
+      <span>Use the portfolio dropdown to open a VC page; it will land on the VC’s default Thesis tab.</span>
+      <span>Example file: <code>vc_soya_zambia.html</code></span>
+    </div>
+  </div>
+
+<script>
+  const VCS = [{"id": "soya_zmb", "label": "Zambia — Soya (Lobito–Upper Rift)", "status": "GO", "file": "vc_soya_zambia.html"}, {"id": "rice_nga", "label": "Nigeria — Rice (Abidjan–Lagos)", "status": "CONDITIONAL", "file": "vc_rice_nigeria.html"}, {"id": "maize_tza", "label": "Tanzania — Maize (Upper Rift–Lobito)", "status": "CONDITIONAL", "file": "vc_maize_tanzania.html"}, {"id": "palm_civ", "label": "Côte d’Ivoire — Palm Oil (Abidjan–Lagos)", "status": "CONDITIONAL", "file": "vc_palm_oil_civ.html"}, {"id": "poultry_sadc", "label": "Southern Africa — Poultry (Limpopo/SADC)", "status": "CONDITIONAL", "file": "vc_poultry_southern_africa.html"}, {"id": "wheat_zwe", "label": "Zimbabwe — Wheat (Limpopo/Southern Africa)", "status": "CONDITIONAL", "file": "vc_wheat_zimbabwe.html"}, {"id": "cashew_abl", "label": "Abidjan–Lagos — Cashew", "status": "ABANDON", "file": "vc_cashew_abl.html"}, {"id": "pulses_ur", "label": "Upper Rift–Lobito — Dried Pulses", "status": "ABANDON", "file": "vc_dried_pulses_ur_lobito.html"}];
+  const OWNER_KEY = "afsti_home_state_v1";
+  const menu = document.getElementById("portfolioMenu");
+  const list = document.getElementById("vcList");
+  const search = document.getElementById("vcSearch");
+  const frame = document.getElementById("mainFrame");
+
+  function loadOwners(){
+    try{
+      const raw = localStorage.getItem(OWNER_KEY);
+      if(!raw) return {};
+      const st = JSON.parse(raw);
+      return st.owners || {};
+    }catch(e){ return {}; }
+  }
+  function statusClass(s){ return s==="GO" ? "go" : (s==="ABANDON" ? "stop" : "amb"); }
+  function statusLabel(s){ return s==="GO" ? "GO" : (s==="ABANDON" ? "ABANDON" : "CONDITIONAL"); }
+
+  function openMenu(){
+    menu.classList.add("show");
+    search.focus();
+    renderList(search.value);
+  }
+  function closeMenu(){ menu.classList.remove("show"); }
+  function toggleMenu(){ menu.classList.contains("show") ? closeMenu() : openMenu(); }
+
+  function renderList(q){
+    const owners = loadOwners();
+    const query = (q||"").toLowerCase().trim();
+    const filtered = VCS.filter(v=>{
+      if(!query) return true;
+      return (v.label.toLowerCase().includes(query) || v.id.toLowerCase().includes(query) || v.status.toLowerCase().includes(query));
+    });
+
+    list.innerHTML = "";
+    filtered.forEach(v=>{
+      const row = document.createElement("div");
+      row.className = "row";
+      const owner = owners[v.id] ? owners[v.id] : "—";
+      row.innerHTML = `
+        <div class="left">
+          <div class="name">${v.label}</div>
+          <div class="meta">
+            <span class="pill ${statusClass(v.status)}">${statusLabel(v.status)}</span>
+            <span class="ownerTag">Owner: ${owner}</span>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--muted);">File: ${v.file}</span>
+          </div>
+        </div>
+        <div style="color:var(--muted);font-size:12px;">→</div>
+      `;
+      row.addEventListener("click", ()=>{
+        frame.src = v.file;   // open VC page exactly as-is
+        closeMenu();
+      });
+      list.appendChild(row);
+    });
+
+    if(filtered.length===0){
+      const empty = document.createElement("div");
+      empty.style.padding = "12px 14px";
+      empty.style.color = "var(--muted)";
+      empty.style.fontSize = "12px";
+      empty.textContent = "No matches.";
+      list.appendChild(empty);
+    }
+  }
+
+  document.getElementById("navPortfolio").addEventListener("click", (e)=>{ e.stopPropagation(); toggleMenu(); });
+  search.addEventListener("input", ()=>renderList(search.value));
+  document.addEventListener("click", (e)=>{ if(!menu.contains(e.target) && e.target.id!=="navPortfolio") closeMenu(); });
+  document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeMenu(); });
+
+  document.getElementById("navHome").addEventListener("click", ()=>{ frame.src = "home_dashboard.html"; closeMenu(); });
+  document.getElementById("navAbout").addEventListener("click", ()=>{ frame.src = "about_project.html"; closeMenu(); });
+
+  renderList("");
+</script>
+</body>
+</html>
